@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['entry','sale','change','removed']);
-            $table->enum('status', ['pending', 'in_progress','in_delivery', 'completed','pending_partially_completed','partially_completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress','in_delivery', 'completed','pending_partially_completed','approve_partially','partially_completed', 'cancelled','return'])->default('pending');
             $table->foreignId('assigned_to')->constrained('users');
-            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles');
-            $table->text('details')->nullable();
+            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles');//solo para venta
+            $table->integer('quantity'); // cantidad a sacar o meter cambiar etc nunca 0
+            $table->text('details')->nullable(); //opcional un detalle
             $table->softDeletes();
             $table->timestamps();
         });

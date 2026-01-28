@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->constrained();
             $table->enum('status', ['pending', 'completed', 'damaged', 'missing', 'other', 'cancelled'])->default('pending');
-            $table->string('moved_to_pallet')->nullable(); //solo para casos de mover paquetes de ubi
+            $table->string('moved_to_pallet')->nullable(); //solo para casos de mover paquetes de ubi y entrada
             $table->text('description')->nullable(); // solo si esta el paquete en damaged,missing,other
             $table->timestamps();
         });

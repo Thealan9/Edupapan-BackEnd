@@ -15,6 +15,7 @@ class Ticket extends Model
         'assigned_to',
         'vehicle_id',
         'details',
+        'quantity',
     ];
 
     public function assignedUser()

@@ -10,7 +10,6 @@ class StockTransaction extends Model
         'book_id',
         'user_id',
         'ticket_id',
-        'quantity',
     ];
 
     public function book()
