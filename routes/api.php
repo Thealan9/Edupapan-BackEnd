@@ -66,13 +66,19 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
         //TIckets
         Route::post('/ticket/entry', [TicketController::class, 'createEntry']);
+        Route::post('/ticket/sale', [TicketController::class, 'createSale']);
+        Route::post('/ticket/removed', [TicketController::class, 'createRemoved']);
+        Route::post('/ticket/change', [TicketController::class, 'createChange']);
 
+        Route::post('/ticket/{ticket}/accept-partial', [TicketController::class, 'ApprovePartial']);
+        Route::post('/ticket/{ticket}/reject-partial', [TicketController::class, 'RejectPartial']);
 
         //Almacenista flujo
         Route::patch('/ticket/{ticket}/accept', [WarehousemanTicket::class, 'accept']);
         Route::patch('/ticket-detail/{detail}/process', [WarehousemanTicketDetail::class, 'processDetail']);
         Route::post('/ticket/{ticket}/complete-entry', [WarehousemanTicket::class, 'completeEntry']);
         Route::post('/ticket/{ticket}/complete-sale', [WarehousemanTicket::class, 'completeSale']);
+        //solicitar completar parcial
         Route::post('/ticket/{ticket}/request-partial', [WarehousemanTicket::class, 'confirmPartial']);
         Route::post('/ticket/{ticket}/complete-partial', [WarehousemanTicket::class, 'completePartialTicket']);
         //autocompletar si faltan paquetes en la venta

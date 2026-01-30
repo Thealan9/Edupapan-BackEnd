@@ -137,7 +137,9 @@ class TicketController extends Controller
 
                 foreach ($details as $detail) {
                     $package = $detail->package;
-                    $package->update(['status' => 'sold']);
+                    if ($detail->status == "completed") {
+                        $package->update(['status' => 'sold']);
+                    }
                 }
                 $ticket->update(['status' => 'in_delivery']);
             });
@@ -187,10 +189,12 @@ class TicketController extends Controller
         ]);
     }
 
-    //paso final de entrada parcial
+    //paso final de entrada parcial valido para entrada salida ya sea rechazo o aprobacion
     public function completePartialTicket(Ticket $ticket)
     {
-        if ($ticket->status !== 'approve_partially' || $ticket->status !== 'refused_partially') {
+        $validStatuses = ['approve_partially', 'refused_partially'];
+
+        if (!in_array($ticket->status, $validStatuses)) {
             return response()->json(['message' => 'Ticket no editable'], 422);
         }
 
