@@ -9,9 +9,13 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LocalController;
 use App\Http\Controllers\Admin\PalletController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\TicketDetailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Warehouseman\TicketController as WarehousemanTicket;
+use App\Http\Controllers\Warehouseman\TicketDetailController as WarehousemanTicketDetail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -21,8 +25,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 
-Route::middleware(['auth:sanctum','active'])->group(function () {
-    Route::get('/yo', fn (Request $r) => $r->user());
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
+    Route::get('/yo', fn(Request $r) => $r->user());
     Route::post('/logout', [AuthController::class, 'logout']);
 
 
@@ -59,6 +63,21 @@ Route::middleware(['auth:sanctum','active'])->group(function () {
         Route::post('/pallet', [PalletController::class, 'store']);
         Route::put('/pallet/{pallet}', [PalletController::class, 'update']);
         Route::delete('/pallet/{pallet}', [PalletController::class, 'destroy']);
+
+        //TIckets
+        Route::post('/ticket/entry', [TicketController::class, 'createEntry']);
+
+
+        //Almacenista flujo
+        Route::patch('/ticket/{ticket}/accept', [WarehousemanTicket::class, 'accept']);
+        Route::patch('/ticket-detail/{detail}/process', [WarehousemanTicketDetail::class, 'processDetail']);
+        Route::post('/ticket/{ticket}/complete-entry', [WarehousemanTicket::class, 'completeEntry']);
+        Route::post('/ticket/{ticket}/complete-sale', [WarehousemanTicket::class, 'completeSale']);
+        Route::post('/ticket/{ticket}/request-partial', [WarehousemanTicket::class, 'confirmPartial']);
+        Route::post('/ticket/{ticket}/complete-partial', [WarehousemanTicket::class, 'completePartialTicket']);
+        //autocompletar si faltan paquetes en la venta
+        Route::post('/ticket/{ticket}/autocomplete-sale', [WarehousemanTicketDetail::class, 'addDetail']);
+
 
         // //locales
         // Route::get('/locals', [LocalController::class, 'index']);

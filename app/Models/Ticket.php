@@ -14,7 +14,7 @@ class Ticket extends Model
         'status',
         'assigned_to',
         'vehicle_id',
-        'details',
+        'description',
         'quantity',
     ];
 

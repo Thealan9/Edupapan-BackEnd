@@ -18,7 +18,9 @@ return new class extends Migration
             $table->foreignId('pallet_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('book_quantity');
             $table->enum('status', [
+                'pending',     // en proceso para ingresar
                 'available',   // Disponible para asignar
+                'return',      //devuelto
                 'reserved',    // Ya asignado a un ticket, no se puede usar por otro
                 'sold',        // Vendido
                 'removed',     // sacar del almacen
