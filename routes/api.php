@@ -78,6 +78,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::patch('/ticket-detail/{detail}/process', [WarehousemanTicketDetail::class, 'processDetail']);
         Route::post('/ticket/{ticket}/complete-entry', [WarehousemanTicket::class, 'completeEntry']);
         Route::post('/ticket/{ticket}/complete-sale', [WarehousemanTicket::class, 'completeSale']);
+        Route::post('/ticket/{ticket}/complete-change', [WarehousemanTicket::class, 'completeChange']);
+        Route::post('/ticket/{ticket}/complete-removed', [WarehousemanTicket::class, 'completeRemoved']);
+
         //solicitar completar parcial
         Route::post('/ticket/{ticket}/request-partial', [WarehousemanTicket::class, 'confirmPartial']);
         Route::post('/ticket/{ticket}/complete-partial', [WarehousemanTicket::class, 'completePartialTicket']);

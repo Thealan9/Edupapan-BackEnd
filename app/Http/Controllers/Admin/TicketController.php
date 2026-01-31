@@ -98,7 +98,7 @@ class TicketController extends Controller
             'description'     => ['nullable', 'string'],
             'packages'    => ['required', 'array', 'min:1'],
 
-            'packages.*.package_id' => ['required', 'exists:packages,id'],
+            'packages.*.package_id' => ['required', 'exists:packages,id','distinct'],
             //'packages.*.batch_number'  => ['required', 'string'],
             //'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             //'packages.*.pallet_id'    => ['required', 'exists:pallets,id'],
@@ -141,8 +141,8 @@ class TicketController extends Controller
             //'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             //'packages.*.pallet_id'    => ['required', 'exists:pallets,id'],
             // 'packages.*.status'       => ['required', 'in:available,damaged,missing,other'],
-            'packages.*.package_id' => ['required', 'exists:packages,id'],
-            'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id', 'distinct'],
+            'packages.*.package_id' => ['required', 'exists:packages,id','distinct'],
+            'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
 
         DB::transaction(function () use ($data, $request, &$ticket) {

@@ -173,6 +173,114 @@ class TicketController extends Controller
         ], 422);
     }
 
+    public function completeChange(Ticket $ticket)
+    {
+        if ($ticket->type !== 'change') {
+            return response()->json(['message' => 'Ticket inválido'], 422);
+        }
+
+        if ($ticket->status !== 'in_progress') {
+            return response()->json(['message' => 'Ticket no editable'], 422);
+        }
+
+        $details = $ticket->details;
+        $total = $ticket->quantity;
+        $summary = [
+            'completed' => $details->where('status', 'completed')->count(),
+            'pending'   => $details->where('status', 'pending')->count(),
+        ];
+
+        //completar todo
+        if ($summary['pending'] > 0) {
+            return response()->json([
+                'message' => 'Aún hay cajas sin procesar',
+            ], 422);
+        }
+
+        if ($summary['completed'] > $total) {
+            return response()->json([
+                'message' => 'Inconsistencia en el ticket'
+            ], 422);
+        }
+
+        if ($summary['completed'] === $total) {
+            DB::transaction(function () use ($ticket, $details) {
+
+                foreach ($details as $detail) {
+                    $package = $detail->package;
+                    if ($detail->status == "completed") {
+                        $package->update([
+                            'status' => 'available',
+                            'pallet_id' => $detail->moved_to_pallet]);
+                    }
+                }
+                $ticket->update(['status' => 'completed']);
+            });
+
+            return response()->json([
+                'message' => 'Lleva las cajas al pallet correspondiente.',
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Estado no válido',
+            'summary' => $summary
+        ], 422);
+    }
+
+    public function completeRemoved(Ticket $ticket)
+    {
+        if ($ticket->type !== 'removed') {
+            return response()->json(['message' => 'Ticket inválido'], 422);
+        }
+
+        if ($ticket->status !== 'in_progress') {
+            return response()->json(['message' => 'Ticket no editable'], 422);
+        }
+
+        $details = $ticket->details;
+        $total = $ticket->quantity;
+        $summary = [
+            'completed' => $details->where('status', 'completed')->count(),
+            'pending'   => $details->where('status', 'pending')->count(),
+        ];
+
+        //completar todo
+        if ($summary['pending'] > 0) {
+            return response()->json([
+                'message' => 'Aún hay cajas sin procesar',
+            ], 422);
+        }
+
+        if ($summary['completed'] > $total) {
+            return response()->json([
+                'message' => 'Inconsistencia en el ticket'
+            ], 422);
+        }
+
+        if ($summary['completed'] === $total) {
+            DB::transaction(function () use ($ticket, $details) {
+
+                foreach ($details as $detail) {
+                    $package = $detail->package;
+                    if ($detail->status == "completed") {
+                        $package->update(['status' => 'removed']);
+                    }
+                }
+                $ticket->update(['status' => 'completed']);
+            });
+
+            return response()->json([
+                'message' => 'Ya puedes llevar las cajas a la basura o seguir instrucciones del ticket.',
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Estado no válido',
+            'summary' => $summary
+        ], 422);
+    }
+
     //pedir aprobacion del ticket
     public function confirmPartial(Ticket $ticket)
     {
