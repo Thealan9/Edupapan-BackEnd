@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['entry','sale','change','removed']);
+            $table->enum('type', ['entry','sale','change','removed','damaged','partial_damaged']);
             $table->enum('status', ['pending', 'in_progress','in_delivery', 'completed','pending_partially_completed','approve_partially','refused_partially','partially_completed', 'cancelled','return'])->default('pending');
             $table->foreignId('assigned_to')->constrained('users');
             $table->foreignId('vehicle_id')->nullable()->constrained('vehicles');//solo para venta

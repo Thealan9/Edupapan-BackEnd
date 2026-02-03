@@ -87,6 +87,11 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         //autocompletar si faltan paquetes en la venta
         Route::post('/ticket/{ticket}/autocomplete-sale', [WarehousemanTicketDetail::class, 'addDetail']);
 
+        //detalles soluciones admin
+        Route::post('/ticket-detail/{detail}/solution-damage', [TicketDetailController::class, 'CreateSolutionDetailTicketDamage']);
+        Route::post('/ticket-detail/{detail}/solution-missing', [TicketDetailController::class, 'CreateSolutionDetailTicketMissing']);
+        //Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);
+
 
         // //locales
         // Route::get('/locals', [LocalController::class, 'index']);

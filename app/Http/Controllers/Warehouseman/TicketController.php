@@ -211,7 +211,8 @@ class TicketController extends Controller
                     if ($detail->status == "completed") {
                         $package->update([
                             'status' => 'available',
-                            'pallet_id' => $detail->moved_to_pallet]);
+                            'pallet_id' => $detail->moved_to_pallet
+                        ]);
                     }
                 }
                 $ticket->update(['status' => 'completed']);
@@ -230,7 +231,9 @@ class TicketController extends Controller
 
     public function completeRemoved(Ticket $ticket)
     {
-        if ($ticket->type !== 'removed') {
+        $validStatuses = ['removed', 'damaged', 'partial_damaged'];
+
+        if (!in_array($ticket->type, $validStatuses)) {
             return response()->json(['message' => 'Ticket inválido'], 422);
         }
 
@@ -264,7 +267,19 @@ class TicketController extends Controller
                 foreach ($details as $detail) {
                     $package = $detail->package;
                     if ($detail->status == "completed") {
-                        $package->update(['status' => 'removed']);
+                        if ($ticket->type == "removed") {
+
+                            $package->update(['status' => 'removed']);
+
+                        } elseif ($ticket->type == "damaged") {
+
+                            $package->update(['status' => 'damaged']);
+
+                        } elseif ($ticket->type == "partial_damaged") {
+
+                            $package->update(['status' => 'partial_damaged']);
+
+                        }
                     }
                 }
                 $ticket->update(['status' => 'completed']);

@@ -67,6 +67,17 @@ class TicketController extends Controller
             //'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
 
+        $validStatuses = ['available'];
+        foreach ($data['packages'] as $pkg) {
+            $package = Package::findOrFail($pkg['package_id']);
+            if (!in_array($package->status,$validStatuses)) {
+                return response()->json([
+                    'message' => 'Este paquete no se puede asignar al ticket, revisa status',
+                    'motivo'  => $package
+                ], 422);
+            }
+        }
+
         DB::transaction(function () use ($data, $request, &$ticket) {
             $ticket = Ticket::create([
                 'type'        => 'sale',
@@ -98,13 +109,24 @@ class TicketController extends Controller
             'description'     => ['nullable', 'string'],
             'packages'    => ['required', 'array', 'min:1'],
 
-            'packages.*.package_id' => ['required', 'exists:packages,id','distinct'],
+            'packages.*.package_id' => ['required', 'exists:packages,id', 'distinct'],
             //'packages.*.batch_number'  => ['required', 'string'],
             //'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             //'packages.*.pallet_id'    => ['required', 'exists:pallets,id'],
             // 'packages.*.status'       => ['required', 'in:available,damaged,missing,other'],
             //'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
+
+        $validStatuses = ['available','reserved','other'];
+        foreach ($data['packages'] as $pkg) {
+            $package = Package::findOrFail($pkg['package_id']);
+            if (!in_array($package->status,$validStatuses)) {
+                return response()->json([
+                    'message' => 'Este paquete no se puede asignar al ticket, revisa status',
+                    'motivo'  => $package
+                ], 422);
+            }
+        }
 
         DB::transaction(function () use ($data, $request, &$ticket) {
             $ticket = Ticket::create([
@@ -141,9 +163,20 @@ class TicketController extends Controller
             //'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             //'packages.*.pallet_id'    => ['required', 'exists:pallets,id'],
             // 'packages.*.status'       => ['required', 'in:available,damaged,missing,other'],
-            'packages.*.package_id' => ['required', 'exists:packages,id','distinct'],
+            'packages.*.package_id' => ['required', 'exists:packages,id', 'distinct'],
             'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
+
+        $validStatuses = ['available'];
+        foreach ($data['packages'] as $pkg) {
+            $package = Package::findOrFail($pkg['package_id']);
+            if (!in_array($package->status,$validStatuses)) {
+                return response()->json([
+                    'message' => 'Este paquete no se puede asignar al ticket, revisa status',
+                    'motivo'  => $package
+                ], 422);
+            }
+        }
 
         DB::transaction(function () use ($data, $request, &$ticket) {
             $ticket = Ticket::create([
@@ -236,7 +269,7 @@ class TicketController extends Controller
                 'status' => 'refused_partially'
             ]);
         }
-         return response()->json([
+        return response()->json([
             'message' => 'Solicitud rechazada'
         ]);
     }
