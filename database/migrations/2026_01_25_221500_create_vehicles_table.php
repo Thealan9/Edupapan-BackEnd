@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('model');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_available')->default(true);
+            $table->string('driver_id')->constrained('users')->nullable();
             $table->timestamps();
         });
     }

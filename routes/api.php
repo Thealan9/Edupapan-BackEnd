@@ -73,6 +73,18 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/ticket/{ticket}/accept-partial', [TicketController::class, 'ApprovePartial']);
         Route::post('/ticket/{ticket}/reject-partial', [TicketController::class, 'RejectPartial']);
 
+
+        //detalles soluciones admin
+        Route::post('/ticket-detail/{detail}/solution-damage', [TicketDetailController::class, 'CreateSolutionDetailTicketDamage']);
+        Route::post('/ticket-detail/{detail}/solution-missing', [TicketDetailController::class, 'CreateSolutionDetailTicketMissing']);
+        //Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);
+    });
+
+    Route::prefix('warehouseman')->middleware('role:warehouseman')->group(function () {
+        //Vista tickets almacenista
+        Route::get('/tickets', [WarehousemanTicket::class, 'index']);
+        Route::get('/ticket/{ticket}', [WarehousemanTicket::class, 'show']);
+
         //Almacenista flujo
         Route::patch('/ticket/{ticket}/accept', [WarehousemanTicket::class, 'accept']);
         Route::patch('/ticket-detail/{detail}/process', [WarehousemanTicketDetail::class, 'processDetail']);
@@ -86,42 +98,6 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/ticket/{ticket}/complete-partial', [WarehousemanTicket::class, 'completePartialTicket']);
         //autocompletar si faltan paquetes en la venta
         Route::post('/ticket/{ticket}/autocomplete-sale', [WarehousemanTicketDetail::class, 'addDetail']);
-
-        //detalles soluciones admin
-        Route::post('/ticket-detail/{detail}/solution-damage', [TicketDetailController::class, 'CreateSolutionDetailTicketDamage']);
-        Route::post('/ticket-detail/{detail}/solution-missing', [TicketDetailController::class, 'CreateSolutionDetailTicketMissing']);
-        //Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);
-
-
-        // //locales
-        // Route::get('/locals', [LocalController::class, 'index']);
-        // Route::post('/locals', [LocalController::class, 'store']);
-        // Route::get('/locals/{local}', [LocalController::class, 'show']);
-        // Route::put('/locals/{local}', [LocalController::class, 'update']);
-        // Route::delete('/locals/{local}', [LocalController::class, 'destroy']);
-
-        // // servicios
-        // Route::get('/services', [ServiceController::class, 'index']);
-        // Route::post('/services', [ServiceController::class, 'store']);
-        // Route::get('/services/{service}', [ServiceController::class, 'show']);
-        // Route::put('/services/{service}', [ServiceController::class, 'update']);
-        // Route::delete('/services/{service}', [ServiceController::class, 'destroy']);
-
-        // // context
-        // Route::post('/service-contexts/{service}', [ContextController::class, 'store']);
-        // Route::put('/service-contexts/{context}', [ContextController::class, 'update']);
-        // Route::delete('/service-contexts/{context}', [ContextController::class, 'destroy']);
-
-        // // availability
-        // Route::post('/service-availability/{service}/', [AvailabilityController::class, 'store']);
-        // Route::put('/service-availability/{availability}', [AvailabilityController::class, 'update']);
-        // Route::delete('/service-availability/{availability}', [AvailabilityController::class, 'destroy']);
-        // Route::post('/service-availability/{service}/range', [AvailabilityController::class, 'storeRange']);
-
-        // // reservas
-        // Route::get('/bookings', [BookingController::class, 'index']);
-        // Route::get('/bookings/{booking}', [BookingController::class, 'show']);
-        // Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
-        // Route::delete('/bookings/{booking}', [BookingController::class, 'cancel']);
     });
+
 });

@@ -58,4 +58,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(StockTransaction::class);
     }
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'driver_id');
+    }
 }

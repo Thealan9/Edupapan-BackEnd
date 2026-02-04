@@ -11,10 +11,16 @@ class Vehicle extends Model
         'model',
         'is_active',
         'is_available',
+        'driver_id',
     ];
 
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
     }
 }

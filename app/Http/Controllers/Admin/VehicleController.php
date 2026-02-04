@@ -22,7 +22,7 @@ class VehicleController extends Controller
             'model'        => ['required', 'string', 'max:255'],
             'is_active'    => ['required', 'boolean'],
             'is_available' => ['required', 'boolean'],
-
+            'driver_id'   => ['nullable', 'exists:users,id'],
         ]);
 
         $veh = Vehicle::create($data);
@@ -50,6 +50,7 @@ class VehicleController extends Controller
             'model'        => ['required', 'string', 'max:255'],
             'is_active'    => ['required', 'boolean'],
             'is_available' => ['required', 'boolean'],
+            'driver_id'   => ['nullable', 'exists:users,id'],
         ]);
 
         $veh->update($data);
