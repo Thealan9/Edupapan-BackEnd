@@ -11,6 +11,22 @@ use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
+    public function index()
+    {
+        $tickets = Ticket::with('assignedTo:id,name')
+            ->where('type', 'in', ['pending', 'in_progress', 'pending_partially_completed', 'approve_partially', 'refused_partially'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($tickets);
+    }
+    public function show(Ticket $ticket)
+    {
+        $ticket->load('assignedTo:id,name', 'details.package', 'stockTransactions.book');
+
+        return response()->json($ticket);
+    }
+
     public function accept(Ticket $ticket)
     {
         if ($ticket->status !== 'pending') {
