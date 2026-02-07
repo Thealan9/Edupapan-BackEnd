@@ -23,4 +23,8 @@ class TicketDetail extends Model
     {
         return $this->belongsTo(Package::class);
     }
+    public function pallet()
+    {
+        return $this->belongsTo(Pallet::class, 'moved_to_pallet');
+    }
 }

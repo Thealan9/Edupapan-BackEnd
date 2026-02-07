@@ -7,14 +7,18 @@ use App\Models\Package;
 use App\Models\Ticket;
 use App\Models\TicketDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::with('assignedTo:id,name')
-            ->where('type', 'in', ['pending', 'in_progress', 'pending_partially_completed', 'approve_partially', 'refused_partially'])
+       // $userId = auth()->id();
+        $userId = Auth::id();
+        $tickets = Ticket::with('assignedUser:id,name')
+            ->where('assigned_to', $userId)
+            ->whereIn('status',['pending', 'in_progress', 'pending_partially_completed', 'approve_partially', 'refused_partially'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -22,7 +26,7 @@ class TicketController extends Controller
     }
     public function show(Ticket $ticket)
     {
-        $ticket->load('assignedTo:id,name', 'details.package', 'stockTransactions.book');
+        $ticket->load('assignedUser:id,name', 'details.package','details.pallet');
 
         return response()->json($ticket);
     }
@@ -170,7 +174,6 @@ class TicketController extends Controller
             return response()->json([
                 'message' => 'Aun hay paquetes disponibles,agrega los faltantes de remplazo.',
                 'action_required' => 'add_replacement',
-                'allowed_actions' => ['add', 'cancel'],
             ], 409);
         }
 
@@ -179,7 +182,6 @@ class TicketController extends Controller
             return response()->json([
                 'message' => 'No se acompleta el pedido y ya no hay paquetes de este libro disponibles, ¿Solicitar un envio parcial?',
                 'action_required' => 'confirm_partial',
-                'allowed_actions' => ['confirm_partial', 'cancel'],
             ], 409);
         }
 

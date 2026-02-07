@@ -17,4 +17,8 @@ class Pallet extends Model
     {
         return $this->hasMany(Package::class);
     }
+    public function ticketDetails()
+    {
+        return $this->hasMany(TicketDetail::class, 'moved_to_pallet');
+    }
 }
