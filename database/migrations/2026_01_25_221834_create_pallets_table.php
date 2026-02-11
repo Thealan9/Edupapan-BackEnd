@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('warehouse_location');
             $table->enum('status', ['empty', 'open', 'full'])->default('empty');
             $table->integer('max_packages_capacity');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ class PalletController extends Controller
             'pallet_code' => ['required', 'string', 'max:20', 'unique:pallets,pallet_code'],
             'warehouse_location' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:empty,open,full'],
-            'max_packages_capacity' => ['required', 'integer', 'min:1'],
+            'max_packages_capacity' => ['required', 'integer', 'min:1','max:50'],
         ]);
 
         $pallet = Pallet::create($data);
@@ -61,6 +61,15 @@ class PalletController extends Controller
 
     public function destroy(Pallet $pallet)
     {
+        $paquetes = $pallet->packages;
+        $asig = $paquetes->whereIn('status',['reserved','available','pending'])->count();
+
+        if($asig > 0 ){
+            return response()->json([
+                'message' => 'El pallet debe estar vacio para eliminar',
+            ], 422);
+        }
+
         $pallet->delete();
 
         return response()->json([
