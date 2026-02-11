@@ -3,15 +3,41 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Package;
+use App\Models\Pallet;
 use App\Models\StockTransaction;
 use App\Models\Ticket;
 use App\Models\TicketDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
+    public function index()
+    {
+        $workers = User::where('role','warehouseman')->pluck('id', 'name');
+        $pallets = Pallet::whereIn('status', ['open', 'empty'])
+        ->withCount(['packages' => function ($query) {
+            $query->whereIn('status', ['pending', 'available', 'reserved']);
+        }])->get()
+        ->map(function ($pallet) {
+            $pallet->remaining_capacity = $pallet->max_packages_capacity - $pallet->packages_count;
+            return $pallet;
+        });
+        $books = Book::pluck('id', 'title');
+        $packages = Package::whereIn('status', ['available'])
+        ->select('id', 'batch_number', 'pallet_id', 'book_id')
+        ->get()
+        ->groupBy('book_id');
+        return response()->json(
+            ['workers' => $workers,
+            'pallets' => $pallets,
+            'books' => $books,
+            'packages' => $packages
+            ]);
+    }
     public function createEntry(Request $request)
     {
         $data = $request->validate([

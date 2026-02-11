@@ -65,6 +65,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::delete('/pallet/{pallet}', [PalletController::class, 'destroy']);
 
         //TIckets
+        Route::get('/ticketI', [TicketController::class, 'index']);
         Route::post('/ticket/entry', [TicketController::class, 'createEntry']);
         Route::post('/ticket/sale', [TicketController::class, 'createSale']);
         Route::post('/ticket/removed', [TicketController::class, 'createRemoved']);
