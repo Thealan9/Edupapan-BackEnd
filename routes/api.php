@@ -71,11 +71,15 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/ticket/removed', [TicketController::class, 'createRemoved']);
         Route::post('/ticket/change', [TicketController::class, 'createChange']);
 
+        Route::get('ticket/request-aprob',[TicketController::class, 'getRequest']);
+        Route::get('ticket/{ticket}/request-aprob',[TicketController::class, 'showRequest']);
         Route::post('/ticket/{ticket}/accept-partial', [TicketController::class, 'ApprovePartial']);
         Route::post('/ticket/{ticket}/reject-partial', [TicketController::class, 'RejectPartial']);
 
 
         //detalles soluciones admin
+        Route::get('ticket-detail/solution',[TicketController::class, 'getSolution']);
+        Route::get('ticket-detail/{detail}/solution',[TicketController::class, 'showSolution']);
         Route::post('/ticket-detail/{detail}/solution-damage', [TicketDetailController::class, 'CreateSolutionDetailTicketDamage']);
         Route::post('/ticket-detail/{detail}/solution-missing', [TicketDetailController::class, 'CreateSolutionDetailTicketMissing']);
         //Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);

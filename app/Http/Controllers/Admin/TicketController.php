@@ -38,6 +38,48 @@ class TicketController extends Controller
             'packages' => $packages
             ]);
     }
+
+    public function getRequest(){
+        $res = Ticket::where('status','pending_partially_completed')
+        ->whereIn('type',['entry','sale'])
+        ->select('id','type',)
+        ->get();
+
+        return response()->json($res);
+    }
+    public function showRequest(Ticket $ticket){
+        $ticket->load('details.package');
+
+
+        $buenEstadoCount = $ticket->details->where('status', 'completed')->count();
+
+        $faltantes = $ticket->quantity - $buenEstadoCount;
+
+        $ticket->buen_estado_count = $buenEstadoCount;
+        $ticket->faltantes = $faltantes;
+
+        return response()->json($ticket);
+    }
+
+    public function getSolution(){
+        $res = TicketDetail::whereIn('status',['damaged', 'missing', 'other'])
+        ->select('id', 'status', 'package_id')
+        ->with('package:id,batch_number')
+        ->get();
+
+        return response()->json($res);
+    }
+    public function showSolution(TicketDetail $detail){
+        $detail->load(['package' => function($query) {
+            $query->select('id', 'batch_number');
+        }]);
+        $workers = User::where('role','warehouseman')->pluck('id', 'name');
+
+        return response()->json([
+            'detail' =>$detail,
+            'workers' =>$workers]);
+    }
+
     public function createEntry(Request $request)
     {
         $data = $request->validate([

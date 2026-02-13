@@ -14,6 +14,11 @@ class TicketDetailController extends Controller
 {
     public function CreateSolutionDetailTicketDamage(Request $request, TicketDetail $detail)
     {
+        $validStatuses = ['completed','partially_completed','cancelled','return'];
+        if(!in_array($detail->ticket->status,$validStatuses)){
+            return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
+        }
+
         if ($detail->status !== 'damaged' || $detail->ticket->type !== 'sale') {
             return response()->json(['message' => 'Status o ticket no valido'], 422);
         }
@@ -21,10 +26,10 @@ class TicketDetailController extends Controller
         $data = $request->validate([
             'confirm' => ['required', 'boolean'],
             'partial' => ['nullable', 'boolean'],
-            'assigned_to' => ['required_if:confirm,true', 'exists:users,id']
+            'assigned_to' => ['required_if:confirm,true','nullable', 'exists:users,id']
         ]);
 
-        response()->json(['message' => $data]);
+       //response()->json(['message' => $data]);
         // si esta dañado
         if (isset($data['confirm']) && $data['confirm'] === true) {
             //si es parcial
@@ -99,6 +104,11 @@ class TicketDetailController extends Controller
 
     public function CreateSolutionDetailTicketMissing(Request $request, TicketDetail $detail)
     {
+        $validStatuses = ['completed','partially_completed','cancelled','return'];
+        if(!in_array($detail->ticket->status,$validStatuses)){
+            return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
+        }
+
         if ($detail->status !== 'missing' || $detail->ticket->type !== 'sale') {
             return response()->json(['message' => 'Status o ticket no valido'], 422);
         }
