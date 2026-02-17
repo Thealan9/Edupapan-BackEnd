@@ -82,7 +82,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::get('ticket-detail/{detail}/solution',[TicketController::class, 'showSolution']);
         Route::post('/ticket-detail/{detail}/solution-damage', [TicketDetailController::class, 'CreateSolutionDetailTicketDamage']);
         Route::post('/ticket-detail/{detail}/solution-missing', [TicketDetailController::class, 'CreateSolutionDetailTicketMissing']);
-        //Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);
+        Route::post('/ticket-detail/{detail}/solution-other', [TicketDetailController::class, 'CreateSolutionDetailTicketOther']);
     });
 
     Route::prefix('warehouseman')->middleware('role:warehouseman')->group(function () {

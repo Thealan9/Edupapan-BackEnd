@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
-            $table->string('batch_number')->index();
+            $table->string('batch_number')->unique()->index();
             $table->foreignId('book_id')->constrained()->onDelete('restrict');
             $table->foreignId('pallet_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('book_quantity');

@@ -71,13 +71,25 @@ class TicketController extends Controller
     }
     public function showSolution(TicketDetail $detail){
         $detail->load(['package' => function($query) {
-            $query->select('id', 'batch_number');
+            $query->select('id', 'batch_number','book_id','pallet_id','book_quantity');
         }]);
         $workers = User::where('role','warehouseman')->pluck('id', 'name');
+        $pallets = Pallet::whereIn('status', ['open', 'empty'])
+        ->withCount(['packages' => function ($query) {
+            $query->whereIn('status', ['pending', 'available', 'reserved']);
+        }])->get()
+        ->map(function ($pallet) {
+            $pallet->remaining_capacity = $pallet->max_packages_capacity - $pallet->packages_count;
+            return $pallet;
+        });
+        $books = Book::pluck('id', 'title');
 
         return response()->json([
             'detail' =>$detail,
-            'workers' =>$workers]);
+            'workers' =>$workers,
+            'pallets' =>$pallets,
+            'books' =>$books
+            ]);
     }
 
     public function createEntry(Request $request)
@@ -89,7 +101,7 @@ class TicketController extends Controller
             'description'     => ['nullable', 'string'],
             'packages'    => ['required', 'array', 'min:1'],
 
-            'packages.*.batch_number'  => ['required', 'string'],
+            'packages.*.batch_number'  => ['required', 'string','unique:packages,batch_number'],
             'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
