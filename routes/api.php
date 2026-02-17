@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\ContextController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LocalController;
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\PalletController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TicketController;
@@ -49,6 +50,12 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/book', [BookController::class, 'store']);
         Route::put('/book/{libro}', [BookController::class, 'update']);
         Route::delete('/book/{libro}', [BookController::class, 'destroy']);
+
+        //paquetes
+        Route::get('/package', [PackageController::class, 'index']);
+        Route::get('/package/{package}', [PackageController::class, 'show']);
+        Route::put('/package/{package}', [PackageController::class, 'update']);
+
 
         //vehiculos
         Route::get('/vehicle', [VehicleController::class, 'index']);

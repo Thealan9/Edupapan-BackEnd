@@ -26,7 +26,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password'=> 'required|min:8',
-            'role' => 'required|in:admin,user,driver,warehouseman',
+            'role' => 'required|in:admin,user,warehouseman',
             'active' => 'boolean'
         ]);
 
