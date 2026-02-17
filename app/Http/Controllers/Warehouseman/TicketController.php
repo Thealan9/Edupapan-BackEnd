@@ -165,7 +165,7 @@ class TicketController extends Controller
             });
 
             return response()->json([
-                'message' => 'Lleva las cajas al vehiculo correspondiente.',
+                'message' => 'Lleva las cajas al area de entrega.',
             ]);
         }
 
@@ -379,7 +379,7 @@ class TicketController extends Controller
                 ]);
 
                 return response()->json([
-                    'message' => 'Lleva las cajas al vehiculo correspondiente.'
+                    'message' => 'Lleva las cajas al area de entrega.'
                 ]);
             }
         } elseif ($ticket->status === 'refused_partially') {
@@ -397,7 +397,7 @@ class TicketController extends Controller
                 ]);
 
                 return response()->json([
-                    'message' => 'Ticket completado como devolución, por favor mueve las cajas para devolverlas.'
+                    'message' => 'Ticket completado como devolución, por favor lleva las cajas para devolución.'
                 ]);
             } elseif ($ticket->type == "sale") {
                 DB::transaction(function () use ($details) {
