@@ -37,7 +37,7 @@ class TicketDetailController extends Controller
         });
 
         return response()->json([
-            'message' => 'Detalle registrado'
+            'message' => 'Paquete procesado'
         ]);
     }
 
@@ -72,7 +72,7 @@ class TicketDetailController extends Controller
                 }
             });
             return response()->json([
-                'message' => 'Se han agregado los reemplazos necesarios.',
+                'message' => 'Se han agregado los paquetes faltantes.',
                 'cantidad_dispo' => $avaible_books,
                 'faltante' => $missing]);
         }
