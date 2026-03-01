@@ -65,6 +65,15 @@ class BookController extends Controller
 
     public function destroy(Book $libro)
     {
+        $books = $libro->packages;
+        $asig = $books->whereIn('status',['reserved','available','pending'])->count();
+
+        if($asig > 0 ){
+            return response()->json([
+                'message' => 'No debe haber paquetes asignados a este libro para eliminar',
+            ], 422);
+        }
+
         $libro->delete();
 
         return response()->json([
