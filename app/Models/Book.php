@@ -22,8 +22,4 @@ class Book extends Model
         return $this->hasMany(Package::class);
     }
 
-    public function stockTransactions()
-    {
-        return $this->hasMany(StockTransaction::class);
-    }
 }

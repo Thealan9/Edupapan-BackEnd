@@ -15,10 +15,10 @@ class TicketDetailController extends Controller
 {
     public function CreateSolutionDetailTicketDamage(Request $request, TicketDetail $detail)
     {
-        $validStatuses = ['completed', 'partially_completed', 'cancelled', 'return'];
-        if (!in_array($detail->ticket->status, $validStatuses)) {
-            return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
-        }
+        // $validStatuses = ['completed', 'partially_completed', 'cancelled', 'return'];
+        // if (!in_array($detail->ticket->status, $validStatuses)) {
+        //     return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
+        // }
 
         if ($detail->status !== 'damaged' || $detail->ticket->type !== 'sale') {
             return response()->json(['message' => 'Status o ticket no valido'], 422);
@@ -48,7 +48,6 @@ class TicketDetailController extends Controller
                         'description' => 'Ticket generado por daño parcial del paquete ID: ' . $detail->package->id,
                     ]);
                     StockTransaction::create([
-                        'book_id'   => $detail->package->book_id,
                         'user_id'   => $request->user()->id,
                         'ticket_id' => $ticket->id,
                     ]);
@@ -76,7 +75,6 @@ class TicketDetailController extends Controller
                         'description' => 'Ticket generado por perdida total del paquete ID: ' . $detail->package->id,
                     ]);
                     StockTransaction::create([
-                        'book_id'   => $detail->package->book_id,
                         'user_id'   => $request->user()->id,
                         'ticket_id' => $ticket->id,
                     ]);
@@ -105,10 +103,10 @@ class TicketDetailController extends Controller
 
     public function CreateSolutionDetailTicketMissing(Request $request, TicketDetail $detail)
     {
-        $validStatuses = ['completed', 'partially_completed', 'cancelled', 'return'];
-        if (!in_array($detail->ticket->status, $validStatuses)) {
-            return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
-        }
+        // $validStatuses = ['completed', 'partially_completed', 'cancelled', 'return'];
+        // if (!in_array($detail->ticket->status, $validStatuses)) {
+        //     return response()->json(['message' => 'Debe finalizar el ticket primero.'], 422);
+        // }
 
         if ($detail->status !== 'missing' || $detail->ticket->type !== 'sale') {
             return response()->json(['message' => 'Status o ticket no valido'], 422);
@@ -175,7 +173,6 @@ class TicketDetailController extends Controller
                         'description' => $data['description'],
                     ]);
                     StockTransaction::create([
-                        'book_id'   => $detail->package->book_id,
                         'user_id'   => $request->user()->id,
                         'ticket_id' => $ticket->id,
                     ]);

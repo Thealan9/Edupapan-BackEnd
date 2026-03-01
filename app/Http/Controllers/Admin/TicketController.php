@@ -116,7 +116,6 @@ class TicketController extends Controller
             ]);
 
             StockTransaction::create([
-                'book_id'   => $data['book_id'],
                 'user_id'   => $request->user()->id,
                 'ticket_id' => $ticket->id,
             ]);
@@ -132,7 +131,6 @@ class TicketController extends Controller
     {
         $data = $request->validate([
             'assigned_to' => ['required', 'exists:users,id'],
-            'book_id'     => ['required', 'exists:books,id'],
             'quantity'    => ['required', 'integer', 'min:1'],
             'description'     => ['nullable', 'string'],
             'packages'    => ['required', 'array', 'min:1'],
@@ -140,15 +138,14 @@ class TicketController extends Controller
             'packages.*.package_id' => ['required', 'exists:packages,id'],
         ]);
 
-        $validStatuses = ['available'];
-        foreach ($data['packages'] as $pkg) {
-            $package = Package::findOrFail($pkg['package_id']);
-            if (!in_array($package->status,$validStatuses)) {
-                return response()->json([
-                    'message' => 'Este paquete no se puede asignar al ticket, revisa status',
-                    'motivo'  => $package
-                ], 422);
-            }
+        $packageIds = collect($data['packages'])->pluck('package_id');
+        $packagesToProcess = Package::whereIn('id', $packageIds)->get();
+        foreach ($packagesToProcess as $package) {
+        if ($package->status !== 'available') {
+            return response()->json([
+                'message' => "El paquete con numero de lote ({$package->batch_number}) no está disponible.",
+            ], 422);
+         }
         }
 
         DB::transaction(function () use ($data, $request, &$ticket) {
@@ -161,16 +158,14 @@ class TicketController extends Controller
             ]);
 
             StockTransaction::create([
-                'book_id'   => $data['book_id'],
                 'user_id'   => $request->user()->id,
                 'ticket_id' => $ticket->id,
             ]);
 
-            $this->processTicketDetails($ticket, $data['packages'], $data['book_id']);
+            $this->processTicketDetails($ticket, $data['packages']);
         });
         return response()->json([
             'message' => 'Venta procesada correctamente.',
-            'ticket'  => $ticket
         ], 201);
     }
     public function createRemoved(Request $request)
@@ -206,12 +201,11 @@ class TicketController extends Controller
             ]);
 
             StockTransaction::create([
-                'book_id'   => $data['book_id'],
                 'user_id'   => $request->user()->id,
                 'ticket_id' => $ticket->id,
             ]);
 
-            $this->processTicketDetails($ticket, $data['packages'], $data['book_id']);
+            $this->processTicketDetails($ticket, $data['packages']);
         });
         return response()->json([
             'message' => 'Retiro procesado correctamente.',
@@ -253,12 +247,11 @@ class TicketController extends Controller
             ]);
 
             StockTransaction::create([
-                'book_id'   => $data['book_id'],
                 'user_id'   => $request->user()->id,
                 'ticket_id' => $ticket->id,
             ]);
 
-            $this->processTicketDetails($ticket, $data['packages'], $data['book_id']);
+            $this->processTicketDetails($ticket, $data['packages']);
         });
         return response()->json([
             'message' => 'Cambio procesada correctamente.',
@@ -266,7 +259,7 @@ class TicketController extends Controller
         ], 201);
     }
 
-    private function processTicketDetails(Ticket $ticket, array $packages, int $bookId)
+    private function processTicketDetails(Ticket $ticket, array $packages, ?int $bookId = null)
     {
 
         $created = 0;

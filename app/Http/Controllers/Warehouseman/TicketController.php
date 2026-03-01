@@ -125,10 +125,8 @@ class TicketController extends Controller
             return response()->json(['message' => 'Ticket no editable'], 422);
         }
 
-        $details = $ticket->details;
+        $details = $ticket->details()->with('package')->get();
         $total = $ticket->quantity;
-        $bookId = $ticket->stockTransactions()->first()->book_id;
-        $avaible_books = $this->getAvailablePackages($bookId);
         //return response()->json(['message' => $avaible_books]);
         $summary = [
             'completed' => $details->where('status', 'completed')->count(),
@@ -169,19 +167,30 @@ class TicketController extends Controller
             ]);
         }
 
-        //disponibles suficientes para acompletar
-        if ($summary['completed'] < $total && $avaible_books >= ($total - $summary['completed'])) {
-            return response()->json([
-                'message' => 'Aun hay paquetes disponibles,agrega los faltantes de remplazo.',
-                'action_required' => 'add_replacement',
-            ], 409);
+        $missingCount = $total - $summary['completed'];
+
+        $incompleteDetails = $details->where('status', '!=', 'completed');
+        $canReplaceAll = true;
+
+        foreach ($incompleteDetails as $detail) {
+            $bookId = $detail->package->book_id;
+            $availableForThisBook = $this->getAvailablePackages($bookId);
+
+            if ($availableForThisBook <= 0) {
+                $canReplaceAll = false;
+                break;
+            }
         }
 
-        //habilitar boton para funcion de pedir aprobacion
-        if ($summary['completed'] < $total && $avaible_books < ($total - $summary['completed'])) {
+        if ($canReplaceAll) {
             return response()->json([
-                'message' => 'No se acompleta el pedido y ya no hay paquetes de este libro disponibles, ¿Solicitar un envio parcial?',
-                'action_required' => 'confirm_partial',
+                'message' => 'Aún hay paquetes disponibles de los libros faltantes, agrega los reemplazos.',
+                'action_required' => 'add_replacement',
+            ], 409);
+        } else {
+            return response()->json([
+               'message' => 'No se completa el pedido y algunos libros ya no tienen stock disponible. ¿Solicitar envío parcial?',
+              'action_required' => 'confirm_partial',
             ], 409);
         }
 
