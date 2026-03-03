@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index()
     {
         return response()->json(
-            User::select('id', 'name', 'email', 'role', 'active', 'created_at')
+            User::select('id', 'name', 'last_name','email', 'role', 'active', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->get()
         );
@@ -21,9 +21,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-//-------------------  arreGLAR---------------
-        $data = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password'=> 'required|min:8',
             'role' => 'required|in:admin,user,warehouseman',
@@ -32,6 +32,7 @@ class UserController extends Controller
 
         $user = User::create([
             'name'    => $request->name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role ?? 'user',
@@ -49,6 +50,7 @@ class UserController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,user,driver,warehouseman',
             //'active' => 'required|boolean',
