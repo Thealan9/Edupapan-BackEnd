@@ -15,6 +15,15 @@ class Book extends Model
         'level',
         'price',
         'supplier',
+        'quantity',
+        'description',
+        'autor',
+        'active',
+        'pages',
+        'year',
+        'edition',
+        'format',
+        'size'
     ];
 
     public function packages()

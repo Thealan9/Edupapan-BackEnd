@@ -17,7 +17,16 @@ return new class extends Migration
             $table->string('isbn')->unique();
             $table->enum('level', ['A1','A2', 'B1','B2','C1','C2']);
             $table->decimal('price', 8, 2);
-            $table->string('supplier');
+            $table->integer('quantity');
+            $table->text('description');
+            $table->string('autor');
+            $table->boolean('active')->default(false); //solo es para saber si se esta vendiendo o no
+            $table->integer('pages');
+            $table->integer('year');
+            $table->integer('edition');
+            $table->enum('format', ['Bolsillo','Tapa Blanda','Tapa Dura']);
+            $table->string('size');
+            $table->string('supplier'); //editorial
             $table->softDeletes();
             $table->timestamps();
         });

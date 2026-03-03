@@ -23,6 +23,15 @@ class BookController extends Controller
             'level'    => ['required', 'in:A1,A2,B1,B2,C1,C2'],
             'price'    => ['required', 'numeric', 'min:0'],
             'supplier' => ['required', 'string', 'max:255'],
+            'quantity'    => ['required', 'integer', 'min:1'],
+            'description' => ['required', 'string'],
+            'autor'       => ['required', 'string', 'max:255'],
+            'active'      => ['boolean'],
+            'pages'       => ['required', 'integer', 'min:1'],
+            'year'        => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'edition'     => ['required', 'integer', 'min:1'],
+            'format'      => ['required', 'in:Bolsillo,Tapa Blanda,Tapa Dura'],
+            'size'        => ['required', 'string', 'max:50'],
 
         ]);
 
@@ -53,6 +62,15 @@ class BookController extends Controller
             'level'    => ['required', 'in:A1,A2,B1,B2,C1,C2'],
             'price'    => ['required', 'numeric', 'min:0'],
             'supplier' => ['required', 'string', 'max:255'],
+            'quantity'    => ['required', 'integer', 'min:1'],
+            'description' => ['required', 'string'],
+            'autor'       => ['required', 'string', 'max:255'],
+            'active'      => ['boolean'],
+            'pages'       => ['required', 'integer', 'min:1'],
+            'year'        => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'edition'     => ['required', 'integer', 'min:1'],
+            'format'      => ['required', 'in:Bolsillo,Tapa Blanda,Tapa Dura'],
+            'size'        => ['required', 'string', 'max:50'],
         ]);
 
         $libro->update($data);
