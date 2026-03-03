@@ -57,12 +57,6 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::put('/package/{package}', [PackageController::class, 'update']);
 
 
-        //vehiculos
-        Route::get('/vehicle', [VehicleController::class, 'index']);
-        Route::get('/vehicle/{veh}', [VehicleController::class, 'show']);
-        Route::post('/vehicle', [VehicleController::class, 'store']);
-        Route::put('/vehicle/{veh}', [VehicleController::class, 'update']);
-        Route::delete('/vehicle/{veh}', [VehicleController::class, 'destroy']);
 
         //pallet
         Route::get('/pallet', [PalletController::class, 'index']);
