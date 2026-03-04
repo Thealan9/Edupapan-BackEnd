@@ -131,9 +131,10 @@ class TicketController extends Controller
         $summary = [
             'completed' => $details->where('status', 'completed')->count(),
             'pending'   => $details->where('status', 'pending')->count(),
-            'damaged'   => $details->where('status', 'damaged')->count(),
-            'missing'   => $details->where('status', 'missing')->count(),
-            'other'   => $details->where('status', 'other')->count(),
+            'failed_unreplaced' => $details->filter(function($detail) {
+        return in_array($detail->status, ['damaged', 'missing', 'other','cancelled'])
+               && $detail->replacements->count() === 0;
+    })->count(),
         ];
 
         //completar todo
@@ -167,16 +168,23 @@ class TicketController extends Controller
             ]);
         }
 
-        $missingCount = $total - $summary['completed'];
+        if ($summary['failed_unreplaced'] > 0) {
 
-        $incompleteDetails = $details->where('status', '!=', 'completed');
+        $failedDetails = $details->whereIn('status', ['damaged', 'missing', 'other'])
+                                 ->filter(fn($d) => $d->replacements->count() === 0);
+
         $canReplaceAll = true;
 
-        foreach ($incompleteDetails as $detail) {
-            $bookId = $detail->package->book_id;
-            $availableForThisBook = $this->getAvailablePackages($bookId);
+        foreach ($failedDetails as $detail) {
+            $originalPkg = $detail->package;
 
-            if ($availableForThisBook <= 0) {
+            // Buscamos si hay stock idéntico disponible para este hueco específico
+            $hasStock = Package::where('book_id', $originalPkg->book_id)
+                ->where('status', 'available')
+                ->where('book_quantity', $originalPkg->book_quantity)
+                ->exists();
+
+            if (!$hasStock) {
                 $canReplaceAll = false;
                 break;
             }
@@ -184,14 +192,15 @@ class TicketController extends Controller
 
         if ($canReplaceAll) {
             return response()->json([
-                'message' => 'Aún hay paquetes disponibles de los libros faltantes, agrega los reemplazos.',
+                'message' => 'Aún hay paquetes disponibles de los libros faltantes, ¿Deseas auto-completar?',
                 'action_required' => 'add_replacement',
             ], 409);
         } else {
             return response()->json([
-               'message' => 'No se completa el pedido y algunos libros ya no tienen stock disponible. ¿Solicitar envío parcial?',
+               'message' => 'No se completa el pedido y no suficientes paquetes disponibles o con la misma cantidad de libros. ¿Solicitar envío parcial?',
               'action_required' => 'confirm_partial',
             ], 409);
+        }
         }
 
         return response()->json([
@@ -459,10 +468,4 @@ class TicketController extends Controller
         }
     }
 
-    private function getAvailablePackages(int $bookId): int
-    {
-        return Package::where('book_id', $bookId)
-            ->where('status', 'available')
-            ->count();
-    }
 }

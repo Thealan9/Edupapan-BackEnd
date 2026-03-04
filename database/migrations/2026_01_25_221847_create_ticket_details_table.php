@@ -18,6 +18,8 @@ return new class extends Migration
             $table->enum('status', ['pending', 'completed', 'damaged', 'missing', 'other', 'cancelled'])->default('pending');
             $table->string('moved_to_pallet')->nullable(); //solo para casos de mover paquetes de ubi y entrada
             $table->text('description')->nullable(); // solo si esta el paquete en damaged,missing,other
+            $table->decimal('price', 8, 2)->nullable();
+            $table->integer('book_quantity')->nullable();
             $table->timestamps();
         });
     }

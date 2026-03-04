@@ -102,11 +102,11 @@ class TicketController extends Controller
             'packages'    => ['required', 'array', 'min:1'],
 
             'packages.*.batch_number'  => ['required', 'string','unique:packages,batch_number'],
-            'packages.*.book_quantity' => ['required', 'integer', 'min:1'],
             'packages.*.moved_to_pallet' => ['required', 'exists:pallets,id'],
         ]);
+        $book = Book::findOrFail($data['book_id']);
 
-        DB::transaction(function () use ($data, $request, &$ticket) {
+        DB::transaction(function () use ($data, $request,$book, &$ticket) {
             $ticket = Ticket::create([
                 'type'        => 'entry',
                 'status'      => 'pending',
@@ -120,7 +120,7 @@ class TicketController extends Controller
                 'ticket_id' => $ticket->id,
             ]);
 
-            $this->processTicketDetails($ticket, $data['packages'], $data['book_id']);
+            $this->processTicketDetails($ticket, $data['packages'], $book);
         });
         return response()->json([
             'message' => 'Entrada procesada correctamente.',
@@ -259,7 +259,7 @@ class TicketController extends Controller
         ], 201);
     }
 
-    private function processTicketDetails(Ticket $ticket, array $packages, ?int $bookId = null)
+    private function processTicketDetails(Ticket $ticket, array $packages, $book = null)
     {
 
         $created = 0;
@@ -272,9 +272,9 @@ class TicketController extends Controller
             if ($ticket->type === 'entry') {
                 $package = Package::create([
                     'batch_number'  => $pkg['batch_number'],
-                    'book_id'       => $bookId,
+                    'book_id'       => $book->id,
                     'pallet_id'     => $pkg['moved_to_pallet'],
-                    'book_quantity' => $pkg['book_quantity'],
+                    'book_quantity' => $book->quantity,
                     'status'        => 'pending',
                 ]);
             } else {
@@ -288,6 +288,9 @@ class TicketController extends Controller
                 'status'    => 'pending',
                 'moved_to_pallet' => in_array($ticket->type, ['entry', 'change']) ? $pkg['moved_to_pallet'] : null,
                 'description' => $pkg['description'] ?? null,
+                'book_quantity'   => $package->book_quantity,
+                'price' => $ticket->type === 'sale' ? $package->book->price : null,
+
             ]);
 
             $created++;

@@ -9,9 +9,12 @@ class TicketDetail extends Model
     protected $fillable = [
         'ticket_id',
         'package_id',
+        'parent_id',
         'status',
         'moved_to_pallet',
         'description',
+        'price',
+        'book_quantity'
     ];
 
     public function ticket()
@@ -26,5 +29,14 @@ class TicketDetail extends Model
     public function pallet()
     {
         return $this->belongsTo(Pallet::class, 'moved_to_pallet');
+    }
+    public function parent()
+    {
+        return $this->belongsTo(TicketDetail::class, 'parent_id');
+    }
+
+    public function replacements()
+    {
+        return $this->hasMany(TicketDetail::class, 'parent_id');
     }
 }

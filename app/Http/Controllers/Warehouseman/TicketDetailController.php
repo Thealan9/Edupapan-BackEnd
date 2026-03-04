@@ -43,58 +43,46 @@ class TicketDetailController extends Controller
 
     // caso en que falte paquete para venta
     public function addDetail(Ticket $ticket)
-    {
+{
 
-    $incompleteDetails = $ticket->details()
-        ->where('status', '!=', 'completed')
+    $detailsToReplace = TicketDetail::where('ticket_id', $ticket->id)
+        ->whereIn('status', ['damaged', 'missing', 'other','cancelled'])
+        ->whereDoesntHave('replacements')
         ->with('package')
         ->get();
 
-    if ($incompleteDetails->isEmpty()) {
-        return response()->json(['message' => 'No hay espacios vacíos para completar en este ticket.'], 422);
+    if ($detailsToReplace->isEmpty()) {
+        return response()->json(['message' => 'No hay huecos nuevos por cubrir.'], 422);
     }
 
     $addedCount = 0;
-    $replacements = [];
 
-    DB::transaction(function () use ($ticket, $incompleteDetails, &$addedCount, &$replacements) {
-        foreach ($incompleteDetails as $detail) {
-            $bookId = $detail->package->book_id;
+    DB::transaction(function () use ($ticket, $detailsToReplace, &$addedCount) {
+        foreach ($detailsToReplace as $originalDetail) {
 
-            $replacementPackage = Package::where('book_id', $bookId)
+            $replacementPackage = Package::where('book_id', $originalDetail->package->book_id)
                 ->where('status', 'available')
+                ->where('book_quantity', $originalDetail->package->book_quantity)
                 ->first();
 
             if ($replacementPackage) {
                 TicketDetail::create([
-                    'ticket_id'  => $ticket->id,
-                    'package_id' => $replacementPackage->id,
-                    'status'     => 'pending',
-                    'moved_to_pallet' => null,
-                    'description'     => null,
+                    'ticket_id'     => $ticket->id,
+                    'package_id'    => $replacementPackage->id,
+                    'parent_id'     => $originalDetail->id,
+                    'status'        => 'pending',
+                    'book_quantity' => $replacementPackage->book_quantity,
+                    'price'         => $originalDetail->price,
+                    'description'   => null
                 ]);
 
                 $replacementPackage->update(['status' => 'reserved']);
-
                 $addedCount++;
-                $replacements[] = [
-                    'book_id' => $bookId,
-                    'new_package_id' => $replacementPackage->id
-                ];
             }
         }
     });
 
-    if ($addedCount > 0) {
-        return response()->json([
-            'message' => "Se han agregado {$addedCount} paquetes de reemplazo.",
-            'replacements' => $replacements
-        ]);
-    }
-
-    return response()->json([
-        'message' => 'No se encontraron paquetes disponibles en el almacén para los libros faltantes.'
-    ], 409);
+    return response()->json(['message' => "Se añadieron {$addedCount} reemplazos."]);
 }
 
     private function getAvailablePackages(int $bookId): int
