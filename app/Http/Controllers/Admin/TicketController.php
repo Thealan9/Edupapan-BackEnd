@@ -27,7 +27,10 @@ class TicketController extends Controller
             return $pallet;
         });
         $books = Book::pluck('id', 'title');
-        $packages = Package::whereIn('status', ['available'])
+        $packages = Package::where('status', 'available')
+        ->whereHas('book', function ($query) {
+            $query->whereColumn('packages.book_quantity', 'books.quantity');
+        })
         ->select('id', 'batch_number', 'pallet_id', 'book_id')
         ->get()
         ->groupBy('book_id');
