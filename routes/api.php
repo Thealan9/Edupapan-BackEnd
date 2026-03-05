@@ -44,6 +44,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
         Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive']);
 
+        Route::put('/users/{user}/change-password', [UserController::class, 'changePassword']);
         //libros
         Route::get('/book', [BookController::class, 'index']);
         Route::get('/book/{libro}', [BookController::class, 'show']);

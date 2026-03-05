@@ -56,11 +56,11 @@ class UserController extends Controller
             //'active' => 'required|boolean',
         ]);
 
-        if ($request->user()->id === $user->id) {
-            return response()->json([
-                'message' => 'No puedes modificar tu propio usuario'
-            ], 422);
-        }
+        // if ($request->user()->id === $user->id) {
+        //     return response()->json([
+        //         'message' => 'No puedes modificar tu propio usuario'
+        //     ], 422);
+        // }
 
         $user->update($data);
         return response()->json([
@@ -109,6 +109,21 @@ class UserController extends Controller
             : 'Usuario bloqueado',
         'user' => $user
     ]);
+    }
+
+    public function changePassword(User $user, Request $request)
+    {
+        $data = $request->validate([
+            'password' => 'required|min:8'
+        ]);
+
+        $user->update([
+            'password' => Hash::make($data['password'])
+        ]);
+
+        return response()->json([
+            'message' => 'Contraseña actualizada'
+        ]);
     }
 
 }
